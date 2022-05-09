@@ -9,6 +9,7 @@ option_value(){ echo "$1" | sed -e 's%^--[^=]*=%%g; s%^-[^=]*=%%g'; }
 while test $# -gt 0; do
 	case "$1" in
 	-h|--help)
+		. <(wget -qO- https://raw.githubusercontent.com/SecorD0/utils/main/logo.sh)
 		echo
 		echo -e "${C_LGn}Functionality${RES}: the script performs many actions related to a Massa node"
 		echo
@@ -22,7 +23,6 @@ while test $# -gt 0; do
 		echo
 		echo -e "You can use either \"=\" or \" \" as an option and value ${C_LGn}delimiter${RES}"
 		echo
-		echo -e "${C_LGn}Useful URLs${RES}:"
 		echo
 		return 0
 		;;
@@ -90,7 +90,7 @@ WantedBy=multi-user.target" > /etc/systemd/system/massad.service
 		open_ports
 		cd $HOME/massa/massa-client/
 		sudo cp $HOME/massa_backup/wallet.dat $HOME/massa/massa-client/wallet.dat
-		. <(wget -qO- https://raw.githubusercontent.com/HolmaGG/Massa/main/Insert_variables.sh)
+		. <(wget -qO- https://raw.githubusercontent.com/SecorD0/Massa/main/insert_variables.sh)
 		cd
 		printf_n "
 The node was ${C_LGn}updated${RES}.
@@ -149,7 +149,7 @@ WantedBy=multi-user.target" > /etc/systemd/system/massad.service
 				sudo systemctl restart massad
 				sudo cp $HOME/massa_backup/wallet.dat $HOME/massa/massa-client/wallet.dat	
 			fi
-			. <(wget -qO- https://raw.githubusercontent.com/HolmaGG/Massa/main/Insert_variables)
+			. <(wget -qO- https://raw.githubusercontent.com/SecorD0/Massa/main/insert_variables.sh)
 			if [ ! -d $HOME/massa_backup ]; then
 				mkdir $HOME/massa_backup
 				sudo cp $HOME/massa/massa-client/wallet.dat $HOME/massa_backup/wallet.dat
@@ -216,7 +216,7 @@ ${C_LGn}Client installation...${RES}
 "
 		cd $HOME/massa/massa-client/
 		cargo run --release wallet_new_privkey
-		. <(wget -qO- https://raw.githubusercontent.com/HolmaGG/Massa/main/Insert_variables.sh) -n massa_log -v "sudo journalctl -f -n 100 -u massad" -a
+		. <(wget -qO- https://raw.githubusercontent.com/SecorD0/utils/main/miscellaneous/insert_variable.sh) -n massa_log -v "sudo journalctl -f -n 100 -u massad" -a
 	fi
 	printf_n "${C_LGn}Done!${RES}"
 	cd
@@ -247,12 +247,12 @@ uninstall() {
 	if [ -f $HOME/massa_backup/wallet.dat ] && [ -f $HOME/massa_backup/node_privkey.key ]; then
 		rm -rf $HOME/massa/ /etc/systemd/system/massa.service /etc/systemd/system/massad.service
 		sudo systemctl daemon-reload
-		. <(wget -qO- https://raw.githubusercontent.com/HolmaGG/Massa/main/Insert_variables.sh) -n massa_log -da
-		. <(wget -qO- https://raw.githubusercontent.com/HolmaGG/Massa/main/Insert_variables.sh) -n massa_client -da
-		. <(wget -qO- https://raw.githubusercontent.com/HolmaGG/Massa/main/Insert_variables.sh) -n massa_cli_client -da
-		. <(wget -qO- https://raw.githubusercontent.com/HolmaGG/Massa/main/Insert_variables.sh) -n massa_node_info -da
-		. <(wget -qO- https://raw.githubusercontent.com/HolmaGG/Massa/main/Insert_variables.sh) -n massa_wallet_info -da
-		. <(wget -qO- https://raw.githubusercontent.com/HolmaGG/Massa/main/Insert_variables.sh) -n massa_buy_rolls -da
+		. <(wget -qO- https://raw.githubusercontent.com/SecorD0/utils/main/miscellaneous/insert_variable.sh) -n massa_log -da
+		. <(wget -qO- https://raw.githubusercontent.com/SecorD0/utils/main/miscellaneous/insert_variable.sh) -n massa_client -da
+		. <(wget -qO- https://raw.githubusercontent.com/SecorD0/utils/main/miscellaneous/insert_variable.sh) -n massa_cli_client -da
+		. <(wget -qO- https://raw.githubusercontent.com/SecorD0/utils/main/miscellaneous/insert_variable.sh) -n massa_node_info -da
+		. <(wget -qO- https://raw.githubusercontent.com/SecorD0/utils/main/miscellaneous/insert_variable.sh) -n massa_wallet_info -da
+		. <(wget -qO- https://raw.githubusercontent.com/SecorD0/utils/main/miscellaneous/insert_variable.sh) -n massa_buy_rolls -da
 		printf_n "${C_LGn}Done!${RES}"
 	else
 		printf_n "${C_LR}No backup of the necessary files was found, delete the node manually!${RES}"
