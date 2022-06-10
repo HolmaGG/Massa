@@ -17,6 +17,7 @@ while test $# -gt 0; do
 		echo -e "${C_LGn}Options${RES}:"
 		echo -e "  -h,  --help        show the help page"
 		echo -e "  -op, --open-ports  open required ports"
+		echo -e "  -rb                replace bootstraps"
 		echo -e "  -s,  --source      install the node using a source code"
 		echo -e "  -un, --uninstall   unistall the node"
 		echo
@@ -32,6 +33,10 @@ while test $# -gt 0; do
 		;;
 	-s|--source)
 		function="install_source"
+		shift
+		;;
+	-rb)
+		function="replace_bootstraps"
 		shift
 		;;
 	-un|--uninstall)
@@ -256,6 +261,30 @@ uninstall() {
 		printf_n "${C_LGn}Done!${RES}"
 	else
 		printf_n "${C_LR}No backup of the necessary files was found, delete the node manually!${RES}"
+	fi	
+}
+replace_bootstraps() {
+	local config_path="$HOME/massa/massa-node/base_config/config.toml"
+	local bootstrap_list=`wget -qO- https://raw.githubusercontent.com/SecorD0/Massa/main/bootstrap_list.txt | shuf -n50 | awk '{ print "        "$0"," }'`
+	local len=`wc -l < "$config_path"`
+	local start=`grep -n bootstrap_list "$config_path" | cut -d: -f1`
+	local end=`grep -n "\[optionnal\] port on which to listen" "$config_path" | cut -d: -f1`
+	local end=$((end-1))
+	local first_part=`sed "${start},${len}d" "$config_path"`
+	local second_part="
+    bootstrap_list = [
+${bootstrap_list}
+    ]
+"
+	local third_part=`sed "1,${end}d" "$config_path"`
+	echo "${first_part}${second_part}${third_part}" > "$config_path"
+	sed -i -e "s%retry_delay *=.*%retry_delay = 10000%; " "$config_path"
+	printf_n "${C_LGn}Done!${RES}"
+	if sudo systemctl status massad 2>&1 | grep -q running; then
+		sudo systemctl restart massad
+		printf_n "
+You can view the node bootstrapping via ${C_LGn}massa_log${RES} command
+"
 	fi	
 }
 
